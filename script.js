@@ -1,37 +1,5 @@
-const menuButton = document.querySelector('.menu-button');
-const mobileNav = document.querySelector('.mobile-nav');
-const form = document.querySelector('#bypass-form');
-const input = document.querySelector('#url-input');
-const message = document.querySelector('#form-message');
-
-menuButton?.addEventListener('click', () => {
-  const open = mobileNav.classList.toggle('open');
-  menuButton.setAttribute('aria-expanded', String(open));
-});
-
-document.querySelectorAll('.mobile-nav a').forEach((link) => link.addEventListener('click', () => {
-  mobileNav.classList.remove('open');
-  menuButton.setAttribute('aria-expanded', 'false');
-}));
-
-form?.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const value = input.value.trim();
-  if (!value) return;
-  const button = form.querySelector('button');
-  button.disabled = true;
-  button.innerHTML = 'Processing <span>…</span>';
-  message.className = 'form-message';
-  message.textContent = 'Checking your link…';
-  window.setTimeout(() => {
-    message.className = 'form-message success';
-    message.textContent = 'UI demo ready — connect your RoNN API endpoint to process links.';
-    button.disabled = false;
-    button.innerHTML = 'Process link <span>↗</span>';
-  }, 700);
-});
-
-const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
-  if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
-}), { threshold: 0.12 });
-document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+const menuButton=document.querySelector('.menu-toggle');const mobileMenu=document.querySelector('#mobile-menu');const form=document.querySelector('#bypass-form');const input=document.querySelector('#url-input');const message=document.querySelector('#form-message');const submitButton=document.querySelector('#submit-button');
+menuButton?.addEventListener('click',()=>{const open=mobileMenu.classList.toggle('open');menuButton.setAttribute('aria-expanded',String(open));menuButton.setAttribute('aria-label',open?'Close navigation':'Open navigation');});document.querySelectorAll('.mobile-menu a').forEach(a=>a.addEventListener('click',()=>{mobileMenu.classList.remove('open');menuButton.setAttribute('aria-expanded','false');menuButton.setAttribute('aria-label','Open navigation');}));
+function setMessage(text,type=''){message.textContent=text;message.className=`form-message ${type}`;}
+form?.addEventListener('submit',async event=>{event.preventDefault();const url=input.value.trim();if(!url)return;try{new URL(url)}catch{setMessage('Enter a complete URL, including https://.','error');return}submitButton.disabled=true;submitButton.innerHTML='Processing <span>…</span>';setMessage('Sending secure request…');try{const endpoint=window.RONN_API_URL||'/api/bypass';const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({url})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.message||`Request failed (${response.status})`);const result=data.url||data.result||data.destination||data.link;if(result){setMessage('Link processed successfully.','success');const link=document.createElement('a');link.href=result;link.target='_blank';link.rel='noopener noreferrer';link.textContent=' Open result ↗';link.style.color='inherit';message.append(link)}else setMessage(data.message||'Request completed, but the API returned no result.','error')}catch(error){setMessage(error.message==='Failed to fetch'?'API unavailable. Check the API endpoint configuration.':error.message,'error')}finally{submitButton.disabled=false;submitButton.innerHTML='Process <span>↗</span>'}});
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));

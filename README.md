@@ -1,22 +1,26 @@
 # RoNN Bypass
 
-A mobile-first redesign for RoNN Bypass with a focused, high-contrast interface inspired by fast link utilities.
+RoNN Bypass is a fresh, mobile-first link-processing interface with a neon violet/cyan visual system, custom RoNN mark, responsive navigation, accessible controls, and reduced-motion support.
 
-## Included
+## API integration
 
-- Responsive landing page and link-processing UI
-- CSS-only visual system with lightweight animations
-- Mobile navigation and touch-friendly controls
-- Reduced-motion support
-- No runtime dependencies or UI framework
-- Lazy reveal animations using `IntersectionObserver`
+The form sends a `POST` request to `/api/bypass` with:
 
-## Run locally
+```json
+{"url":"https://example.com"}
+```
 
-Serve the directory with any static server, for example:
+The API should return JSON containing one of `url`, `result`, `destination`, or `link`. To use a different endpoint, define `window.RONN_API_URL` before `script.js`, for example:
+
+```html
+<script>window.RONN_API_URL = 'https://api.example.com/bypass';</script>
+<script src="script.js"></script>
+```
+
+The repository contains only the frontend integration; the server-side bypass implementation must be supplied by the API owner.
+
+## Local preview
 
 ```bash
 python3 -m http.server 8080
 ```
-
-The link form currently shows a UI demo message. Connect the submit handler in `script.js` to the production RoNN API when the endpoint is available.
